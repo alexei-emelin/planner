@@ -7,7 +7,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
-	_ "modernc.org/sqlite"
+    _ "github.com/mattn/go-sqlite3" // ← новый драйвер, вместо modernc.org/sqlite
+	"github.com/joho/godotenv" // добавить в зависимости через go get
 )
 
 type Task struct {
@@ -24,12 +25,14 @@ func count(db *sqlx.DB) (int, error) {
 }
 
 func openDB(t *testing.T) *sqlx.DB {
+	// Загрузка переменных окружения из .env
+    _ = godotenv.Load()
 	dbfile := DBFile
 	envFile := os.Getenv("TODO_DBFILE")
 	if len(envFile) > 0 {
 		dbfile = envFile
 	}
-	db, err := sqlx.Connect("sqlite", dbfile)
+	db, err := sqlx.Connect("sqlite3", dbfile)
 	assert.NoError(t, err)
 	return db
 }

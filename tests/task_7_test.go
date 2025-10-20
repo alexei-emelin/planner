@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 	"time"
-
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/stretchr/testify/assert"
 )
 
