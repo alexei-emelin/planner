@@ -4,6 +4,8 @@ import (
 	"log"
 	"planner/pkg/db"
 	"planner/pkg/server"
+	_ "github.com/joho/godotenv/autoload"
+
 )
 
 func main() {
