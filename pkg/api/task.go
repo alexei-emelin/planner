@@ -5,6 +5,11 @@ import (
 	"encoding/json"
 	"planner/pkg/db"
 )
+
+const (
+    TasksLimit = 50 // Максимальное количество возвращаемых задач
+)
+
 func taskHandler(w http.ResponseWriter, r *http.Request) {
     switch r.Method {
     case http.MethodPost:
@@ -22,8 +27,9 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 
 
 // writeJson возвращает json-ответ
-func writeJson(w http.ResponseWriter, data any) {
+func writeJson(w http.ResponseWriter, data any, statusCode int) {
     w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(statusCode)
     json.NewEncoder(w).Encode(data)
 }
 
@@ -37,11 +43,11 @@ func tasksHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    tasks, err := db.Tasks(50)
+    tasks, err := db.Tasks(TasksLimit)
     if err != nil {
-        writeJson(w, map[string]string{"error": err.Error()})
+        writeJson(w, map[string]string{"error": err.Error()}, http.StatusBadRequest)
         return
     }
 
-    writeJson(w, TasksResp{Tasks: tasks})
+    writeJson(w, TasksResp{Tasks: tasks}, http.StatusBadRequest)
 }

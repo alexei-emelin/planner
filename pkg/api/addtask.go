@@ -12,24 +12,24 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
     var task db.Task
     decoder := json.NewDecoder(r.Body)
     if err := decoder.Decode(&task); err != nil {
-        writeJson(w, map[string]string{"error": "ошибка десериализации JSON"})
+        writeJson(w, map[string]string{"error": "ошибка десериализации JSON"}, http.StatusBadRequest)
         return
     }
     if task.Title == "" {
-        writeJson(w, map[string]string{"error": "не указан заголовок задачи"})
+        writeJson(w, map[string]string{"error": "не указан заголовок задачи"}, http.StatusBadRequest)
         return
     }
     if err := checkDate(&task); err != nil {
-        writeJson(w, map[string]string{"error": err.Error()})
+        writeJson(w, map[string]string{"error": err.Error()}, http.StatusBadRequest)
         return
     }
 
     id, err := db.AddTask(&task)
     if err != nil {
-        writeJson(w, map[string]string{"error": err.Error()})
+        writeJson(w, map[string]string{"error": err.Error()}, http.StatusBadRequest)
         return
     }
-    writeJson(w, map[string]interface{}{"id": id})
+    writeJson(w, map[string]interface{}{"id": id}, http.StatusBadRequest)
 }
 
 // Проверка и коррекция даты задачи, валидация repeat и вычисление nextDate
@@ -59,12 +59,3 @@ func checkDate(task *db.Task) error {
     }
     return nil
 }
-
-// // сравнение только дат (без учёта времени)
-// func afterNow(date, now time.Time) bool {
-//     y1, m1, d1 := date.Date()
-//     y2, m2, d2 := now.Date()
-//     t1 := time.Date(y1, m1, d1, 0, 0, 0, 0, time.UTC)
-//     t2 := time.Date(y2, m2, d2, 0, 0, 0, 0, time.UTC)
-//     return t1.After(t2)
-// }

@@ -17,10 +17,4 @@ COPY --from=builder /app/web ./web
 COPY --from=builder /app/app .
 COPY --from=builder /app/.env .env
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libsqlite3-0 ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
-
-EXPOSE 7540
-
 CMD ["./app"]

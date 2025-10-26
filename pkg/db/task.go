@@ -39,17 +39,23 @@ func Tasks(limit int) ([]*Task, error) {
 
     var tasks []*Task
 
-    for rows.Next() {
-        var t Task
-        var id int64
+	for rows.Next() {
+		var id int64
+		var date, title, comment, repeat string
 
-        if err := rows.Scan(&id, &t.Date, &t.Title, &t.Comment, &t.Repeat); err != nil {
-            return nil, err
-        }
+		if err := rows.Scan(&id, &date, &title, &comment, &repeat); err != nil {
+			return nil, err
+		}
 
-        t.ID = fmt.Sprintf("%d", id)
-        tasks = append(tasks, &t)
-    }
+		tasks = append(tasks, &Task{
+			ID:      fmt.Sprintf("%d", id),
+			Date:    date,
+			Title:   title,
+			Comment: comment,
+			Repeat:  repeat,
+		})
+	}
+
 
     if err := rows.Err(); err != nil {
         return nil, err
@@ -64,18 +70,26 @@ func Tasks(limit int) ([]*Task, error) {
 
 func GetTask(id string) (*Task, error) {
     query := `SELECT id, date, title, comment, repeat FROM scheduler WHERE id = ?`
-    var t Task
+    
     var idInt int64
-    err := DB.QueryRow(query, id).Scan(&idInt, &t.Date, &t.Title, &t.Comment, &t.Repeat)
+    var date, title, comment, repeat string
+    
+    err := DB.QueryRow(query, id).Scan(&idInt, &date, &title, &comment, &repeat)
     if err != nil {
         if err == sql.ErrNoRows {
             return nil, fmt.Errorf("задача не найдена")
         }
         return nil, err
     }
-    t.ID = fmt.Sprintf("%d", idInt)
-    return &t, nil
+    return &Task{
+        ID:      fmt.Sprintf("%d", idInt),
+        Date:    date,
+        Title:   title,
+        Comment: comment,
+        Repeat:  repeat,
+    }, nil
 }
+
 
 func UpdateTask(task *Task) error {
     query := `

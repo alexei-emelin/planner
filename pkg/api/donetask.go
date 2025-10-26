@@ -14,23 +14,23 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 
     id := r.URL.Query().Get("id")
     if id == "" {
-        writeJson(w, map[string]string{"error": "не указан идентификатор"})
+        writeJson(w, map[string]string{"error": "не указан идентификатор"}, http.StatusBadRequest)
         return
     }
 
     task, err := db.GetTask(id)
     if err != nil {
-        writeJson(w, map[string]string{"error": err.Error()})
+        writeJson(w, map[string]string{"error": err.Error()}, http.StatusBadRequest)
         return
     }
 
     // Если правило повторения пустое — просто удаляем задачу
     if task.Repeat == "" {
         if err := db.DeleteTask(id); err != nil {
-            writeJson(w, map[string]string{"error": err.Error()})
+            writeJson(w, map[string]string{"error": err.Error()}, http.StatusBadRequest)
             return
         }
-        writeJson(w, map[string]string{})
+        writeJson(w, map[string]string{}, http.StatusBadRequest)
         return
     }
 
@@ -38,14 +38,14 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
     now := time.Now()
     next, err := NextDate(now, task.Date, task.Repeat)
     if err != nil {
-        writeJson(w, map[string]string{"error": err.Error()})
+        writeJson(w, map[string]string{"error": err.Error()}, http.StatusBadRequest)
         return
     }
 
     if err := db.UpdateDate(next, id); err != nil {
-        writeJson(w, map[string]string{"error": err.Error()})
+        writeJson(w, map[string]string{"error": err.Error()}, http.StatusBadRequest)
         return
     }
 
-    writeJson(w, map[string]string{})
+    writeJson(w, map[string]string{}, http.StatusBadRequest)
 }

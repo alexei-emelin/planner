@@ -17,6 +17,11 @@ func nextDayHandler(w http.ResponseWriter, r *http.Request) {
     dateStr := r.FormValue("date")
     repeatStr := r.FormValue("repeat")
 
+    if r.Method != http.MethodGet {
+        http.Error(w, "Недопустимый метод", http.StatusMethodNotAllowed)
+        return
+    }
+
     var now time.Time
     var err error
 

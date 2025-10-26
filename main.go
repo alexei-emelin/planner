@@ -14,6 +14,7 @@ func main() {
 	if err := db.Init(dbFile); err != nil {
 		log.Fatalf("Ошибка инициализации БД: %v", err)
 	}
+	defer db.DB.Close()
 // Запуск сервера
     server.Run()
 
